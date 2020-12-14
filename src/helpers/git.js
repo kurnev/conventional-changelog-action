@@ -6,7 +6,6 @@ const { GITHUB_REPOSITORY, GITHUB_REF, ENV } = process.env
 const branch = GITHUB_REF.replace('refs/heads/', '')
 
 module.exports = new (class Git {
-
   constructor() {
     const githubToken = core.getInput('github-token', { required: true })
 
@@ -37,30 +36,30 @@ module.exports = new (class Git {
    * @param command
    * @return {Promise<>}
    */
-  exec = command => new Promise(async(resolve, reject) => {
-    let myOutput = ''
-    let myError = ''
+  exec = (command) =>
+    new Promise(async (resolve, reject) => {
+      let myOutput = ''
+      let myError = ''
 
-    const options = {
-      listeners: {
-        stdout: (data) => {
-          myOutput += data.toString()
+      const options = {
+        listeners: {
+          stdout: (data) => {
+            myOutput += data.toString()
+          },
+          stderr: (data) => {
+            myError += data.toString()
+          },
         },
-        stderr: (data) => {
-          myError += data.toString()
-        },
-      },
-    }
+      }
 
-    try {
-      await exec.exec(`git ${command}`, null, options)
+      try {
+        await exec.exec(`git ${command}`, null, options)
 
-      resolve(myOutput)
-
-    } catch (e) {
-      reject(e)
-    }
-  })
+        resolve(myOutput)
+      } catch (e) {
+        reject(e)
+      }
+    })
 
   /**
    * Set a git config prop
@@ -77,7 +76,7 @@ module.exports = new (class Git {
    * @param file
    * @returns {*}
    */
-  add = file => this.exec(`add ${file}`)
+  add = (file) => this.exec(`add ${file}`)
 
   /**
    * Commit all changes
@@ -87,16 +86,14 @@ module.exports = new (class Git {
    *
    * @return {Promise<>}
    */
-  commit = (message, args = []) => (
-    this.exec(`commit -m "${message}" ${args.join(' ')}`)
-  )
+  commit = (message, args = []) => this.exec(`commit -m "${message}" ${args.join(' ')}`)
 
   /**
    * Pull the full history
    *
    * @return {Promise<>}
    */
-  pull = async() => {
+  pull = async () => {
     const args = ['pull']
 
     // Check if the repo is unshallow
@@ -115,9 +112,7 @@ module.exports = new (class Git {
    *
    * @return {Promise<>}
    */
-  push = () => (
-    this.exec(`push origin ${branch} --follow-tags`)
-  )
+  push = () => this.exec(`push origin ${branch} --follow-tags`)
 
   /**
    * Check if the repo is shallow
@@ -136,7 +131,7 @@ module.exports = new (class Git {
    * @param repo
    * @return {Promise<>}
    */
-  updateOrigin = repo => this.exec(`remote set-url origin ${repo}`)
+  updateOrigin = (repo) => this.exec(`remote set-url origin ${repo}`)
 
   /**
    * Creates git tag
@@ -144,6 +139,5 @@ module.exports = new (class Git {
    * @param tag
    * @return {Promise<>}
    */
-  createTag = tag => this.exec(`tag -a ${tag} -m "${tag}"`)
-
+  createTag = (tag) => this.exec(`tag -a ${tag} -m "${tag}"`)
 })()
